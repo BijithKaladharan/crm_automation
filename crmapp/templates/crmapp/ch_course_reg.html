@@ -1,4 +1,4 @@
-{% extends 'crmapp/admin.html' %}
+{% extends 'crmapp/ch_base.html' %}
 {% block body_block %}
 <form method="post">
     {% csrf_token %}
@@ -7,7 +7,7 @@
 </form>
 <table class="table">
     <tr>
-        <td>Course</td>
+        <td>Courses</td>
         <td>Duration</td>
     </tr>
     {% for course in courses %}

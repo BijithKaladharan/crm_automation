@@ -25,5 +25,18 @@ urlpatterns = [
     path('batch', Batch_Creation.as_view(), name='batch'),
     path('batch_edit/<int:id>', Batch_edit.as_view(), name='batch_edit'),
     path('batch_delete/<int:id>', Batch_delete.as_view(), name='batch_delete'),
+    path('cs_register', CounsellorRegistration.as_view(), name='cs_register'),
+    path('cs_login', CounsellorLogin.as_view(), name='cs_login'),
+    path('cs_view', Counsellor_View.as_view(), name='cs_view'),
+    path('cs_edit/<int:id>', Counsellor_Edit.as_view(), name='cs_edit'),
+    path('cs_delete/<int:id>', Counsellor_Delete.as_view(), name='cs_delete'),
+    path('enquiry', Enquiry_Creation.as_view(), name='enquiry'),
+    path('enquiry_edit/<int:id>', Enquiry_Edit.as_view(), name='enquiry_edit'),
+    path('enquiry_delete/<int:id>', Enquiry_Delete.as_view(), name='enquiry_delete'),
+    path('followup', Follow_up.as_view(), name='followup'),
+    # path('admission/<int:id>', Admission_Creation.as_view(), name='admission'),
+    # path('admission_edit/<int:id>', Admission_Edit.as_view(), name='admission_edit'),
+    # path('admission_delete/<int:id>', Admission_Delete.as_view(), name='admission_delete'),
+    #
 
 ]

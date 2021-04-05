@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-{%load static%}
-
+{%load static %}
 
 <html lang="en">
 
@@ -37,7 +36,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">CRM <sup>AUTOMATION</sup></div>
+                <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
             </a>
 
             <!-- Divider -->
@@ -47,7 +46,7 @@
             <li class="nav-item active">
                 <a class="nav-link" href="index.html">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Home</span></a>
+                    <span>Dashboard</span></a>
             </li>
 
             <!-- Divider -->
@@ -174,9 +173,9 @@
                     <!-- Topbar Search -->
                     <form>
 
-                       <a class="collapse-item" href="{% url 'course' %}">courses |</a>
-                        <a class="collapse-item" href="{% url 'batch' %}">batch |</a>
-                        <a class="collapse-item" href="{% url 'cs_register' %}">counsellors Registration |</a>
+                       <a class="collapse-item" href="{% url 'followup' %}">Follow Up</a>
+                        <a class="collapse-item" href="{% url 'enquiry' %}">Enquiry</a>
+                        <a class="collapse-item" href="{% url 'cs_register' %}">counsellors Registration </a>
                          <a class="collapse-item" href="{% url 'cs_view' %}">Counsellors </a>
 
                     </form>
