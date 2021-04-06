@@ -34,9 +34,14 @@ urlpatterns = [
     path('enquiry_edit/<int:id>', Enquiry_Edit.as_view(), name='enquiry_edit'),
     path('enquiry_delete/<int:id>', Enquiry_Delete.as_view(), name='enquiry_delete'),
     path('followup', Follow_up.as_view(), name='followup'),
-    # path('admission/<int:id>', Admission_Creation.as_view(), name='admission'),
-    # path('admission_edit/<int:id>', Admission_Edit.as_view(), name='admission_edit'),
-    # path('admission_delete/<int:id>', Admission_Delete.as_view(), name='admission_delete'),
-    #
+    path('admission/<int:id>', Admission_Creation.as_view(), name='admission'),
+    path('admission_edit/<int:id>', Admission_Edit.as_view(), name='admission_edit'),
+    path('admission_delete/<int:id>', Admission_Delete.as_view(), name='admission_delete'),
+    path('st_view<int:id>', Student_Details.as_view(), name='st_view'),
+    path('st_register<int:id>', Student_Registration.as_view(), name='st_register'),
+    path('st_login', Student_login.as_view(), name='st_login'),
+    path('pay', Student_Payments.as_view(), name='pay'),
+    path('home', DashBoard.as_view(), name='home'),
+
 
 ]

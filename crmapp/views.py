@@ -296,10 +296,293 @@ class Enquiry_Delete(TemplateView):
 
 class Follow_up(TemplateView):
     model = Enquiry
-    template_name = "app_crm/cs_follow_up_date.html"
+    template_name = "crmapp/cs_followup_date.html"
     def get(self, request, *args, **kwargs):
         dates = Enquiry.objects.filter(followup_date=date.today())
         self.context = {
             "dates":dates
         }
         return render(request, self.template_name, self.context)
+
+class Admission_Creation(TemplateView):
+    model = Admissions
+    form_class = AdmissionCreateForm
+    template_name = 'crmapp/cs_admissions.html'
+
+    def get_object(self, id):
+        return Enquiry.objects.get(id=id)
+    def get(self, request, *args, **kwargs):
+        admission = self.model.objects.last()
+        id = kwargs.get("id")
+        students = self.get_object(id)
+
+        if admission:
+            last_adm = admission.admission_number
+            lst = int(last_adm.split('-')[1]) + 1
+            adm = 'LMNR-' + str(lst)
+        else:
+            adm = 'LMNR-1000'
+        admissions = Admissions.objects.all()
+        eid = students.enquiry_id
+        batch = students.batch
+        form = self.form_class(initial={'admission_number': adm, 'eid': eid, 'batch_code': batch})
+        #eid = students.enquiry_id
+        #batch = students.batch
+        #batchcode = Enquiry.objects.filter(batch__batch_code=batch)
+        #bcode = [b.batch for b in batchcode]
+        #for i in bcode:
+         #   code = i.batch_code
+
+        #form = self.form_class(initial={'admission_number': adm,'eid':eid, 'batch_code':code})
+
+        self.context = {
+            "admissions": admissions,
+            "form": form,
+        }
+        return render(request, self.template_name, self.context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            form.save()
+            admissions = Admissions.objects.all()
+            self.context = {
+                "form": self.form_class,
+                "admissions": admissions
+            }
+            return render(request, self.template_name, self.context)
+        else:
+            self.context = {
+                "form": self.form_class
+            }
+            return render(request, self.template_name, self.context)
+
+class Admission_Edit(TemplateView):
+    model = Admissions
+    form_class = AdmissionCreateForm
+    template_name = 'crmapp/cs_admissions.html'
+    def get_object(self, id):
+        return self.model.objects.get(id=id)
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get("id")
+        admissions = self.get_object(id)
+        form = self.form_class(instance=admissions)
+        self.context = {
+            "form":form,
+        }
+        return render(request, self.template_name, self.context)
+    def post(self, request, *args, **kwargs):
+        id = kwargs.get("id")
+        admissions = self.get_object(id)
+        form = self.form_class(request.POST, instance=admissions)
+        if form.is_valid():
+            form.save()
+            admissions = Admissions.objects.all()
+            self.context = {
+                "form": self.form_class,
+                "admissions": admissions
+            }
+            return render(request, self.template_name, self.context)
+
+        return render(request, self.template_name, self.context)
+
+class Admission_Delete(TemplateView):
+    model = Admissions
+    form_class = AdmissionCreateForm
+    template_name = 'crmapp/cs_admissions.html'
+    def get_object(self, id):
+        return self.model.objects.get(id=id)
+
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get("id")
+        admission = self.get_object(id)
+        admission.delete()
+        admissions = Admissions.objects.all()
+        self.context = {
+            "form": self.form_class,
+            "admissions": admissions
+        }
+        return render(request, self.template_name, self.context)
+
+class Student_Details(TemplateView):
+    model = Admissions
+    template_name = 'crmapp/cs_student_details.html'
+    def get_object(self, id):
+        return self.model.objects.get(id=id)
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get("id")
+        admissions = self.get_object(id)
+        eid = admissions.eid
+
+        students = Enquiry.objects.get(enquiry_id=eid)
+        self.context = {
+            'admissions':admissions,
+            'students':students
+        }
+        return render(request, self.template_name, self.context)
+
+class Student_Registration(TemplateView):
+    form_class = StudentRegistraionForm
+    template_name = 'crmapp/ch_counsellor_reg.html'
+    def get_object(self, id):
+        return Admissions.objects.get(id=id)
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get("id")
+        admission = self.get_object(id)
+        admission_number = admission.admission_number
+        eid = admission.eid
+        form = self.form_class(initial={'username': admission_number, 'password1': eid })
+        self.context = {
+            "form":form
+        }
+        return render(request, self.template_name, self.context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('st_login')
+        else:
+            self.context = {
+                "form": form
+            }
+            return render(request, self.template_name, self.context)
+
+class Student_login(TemplateView):
+    form_class = LoginForm
+    template_name = 'crmapp/cs_login.html'
+
+    def get(self, request, *args, **kwargs):
+        self.context = {
+            "form": self.form_class
+        }
+        return render(request, self.template_name, self.context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = authenticate(username=username, password=password)
+            if user != None:
+                login(request, user)
+                return render(request, 'crmapp/st_home.html')
+            else:
+                self.context = {
+                    "form": form
+                }
+                return render(request, self.template_name, self.context)
+
+class Student_Payments(TemplateView):
+    model = Payment
+    form_class = PaymentCreateForm
+    template_name = 'crmapp/st_payment.html'
+    def get(self, request, *args, **kwargs):
+        admission = Admissions.objects.get(admission_number=request.user)
+        admission_number = admission.admission_number
+
+        eid = admission.eid
+
+        form = self.form_class(initial={'admission_number': admission_number, 'eid': eid})
+        #payments = Payment.objects.get(admission_number=request.user)
+        self.context = {
+            "form": form,
+            #"payments":payments
+        }
+        return render(request, self.template_name, self.context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            #payments = Payment.objects.get(admission_number=request.user)
+            self.context = {
+                "form": self.form_class,
+                #"payments": payments
+            }
+            return render(request, self.template_name, self.context)
+        else:
+            self.context = {
+                "form": self.form_class
+            }
+            return render(request, self.template_name, self.context)
+
+class DashBoard(TemplateView):
+    template_name = 'crmapp/admin.html'
+    def get(self, request, *args, **kwargs):
+        context = {}
+        lst = []
+        status = 'yet to begin'
+        dic = {}
+        dic1 = {}
+        batch = Batch.objects.filter(status=status)
+        admision = Admissions.objects.filter(batch_code__in=[b.batch_code for b in batch])
+        enquiry = Enquiry.objects.filter(enquiry_id__in=[a.eid for a in admision])
+        course = [e.course for e in enquiry]
+
+        for obj in course:
+            if obj not in dic1:
+                lst.append(str(obj))
+
+                dic1[obj] = 1
+            else:
+                dic1[obj]+=1
+
+        for key, value in dic1.items():
+
+            if key not in dic:
+                dic[str(key)] = value
+
+        count = str(len(lst))
+
+
+
+        #Pending Fees
+
+        status = "in progress"
+        f_batch = Batch.objects.filter(status=status)
+        f_admision = Admissions.objects.filter(batch_code__in=[b.batch_code for b in f_batch])
+        fees = [a.fees for a in f_admision]
+        #print(fees)
+        f_enquiry = Enquiry.objects.filter(enquiry_id__in=[a.eid for a in f_admision])
+        crse = [e.course for e in f_enquiry]
+        course_1 = {}
+        course_2 = {}
+        count_1 = []
+
+        #total = f_admision["fees__sum"]
+        #print(total)
+        pay = Payment.objects.filter(admission_number__in=[a.admission_number for a in f_admision])
+        amount = [p.amount for p in pay]
+        fees = [a.fees for a in f_admision]
+        total = [x1 - x2 for (x1, x2) in zip(fees, amount)]
+        for obj in crse:
+            if obj not in course_1:
+                count_1.append(obj)
+                course_1[obj] = None
+            else:
+                course_1[obj] = None
+
+        for fee in total:
+            course_1[obj] = fee
+
+        for key, value in course_1.items():
+
+            if key not in dic:
+                course_2[str(key)] = value
+
+        #print(course_2)
+        count1= str(len(count_1))
+
+        context = {
+            "dic": dic,
+            "lst": lst,
+            "count": count,
+
+            "course":course_2,
+            "count_1": count1,
+
+        }
+
+        return render(request, self.template_name, context)
