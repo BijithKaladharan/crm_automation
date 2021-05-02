@@ -3,6 +3,7 @@ from django import forms
 from .models import *
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+import datetime
 
 class CourseCreateForm(ModelForm):
     class Meta:
@@ -25,6 +26,17 @@ class BatchCreateForm(ModelForm):
             'status': forms.Select(attrs={'class': 'form-control'}),
 
         }
+
+    def clean(self):
+            cleaned_data = super().clean()
+            fees = cleaned_data.get('fees')
+
+            if fees < 10000:
+                msg = " Fees should be grater than 10000"
+                self.add_error("fees", msg)
+
+
+
 
 class CounsellorRegistrationForm(UserCreationForm):
     class Meta:
@@ -63,6 +75,27 @@ class EnquiryCreateForm(ModelForm):
 
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['batch'].queryset = Batch.objects.none()
+
+        if 'course' in self.data:
+            try:
+                course_id = int(self.data.get('course'))
+                self.fields['batch'].queryset = Batch.objects.filter(course_name=course_id).order_by('enquiry')
+            except (ValueError, TypeError):
+                pass  # invalid input from the client; ignore and fallback to empty City queryset
+        elif self.instance.pk:
+            self.fields['batch'].queryset = self.instance.course.batch_set.order_by('enquiry')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        followup_date = cleaned_data.get('followup_date')
+
+        if followup_date < datetime.date.today():
+            msg = " Follow Up date should be future date"
+            self.add_error("followup_date", msg)
+
 
 class AdmissionCreateForm(ModelForm):
     class Meta:
@@ -76,6 +109,14 @@ class AdmissionCreateForm(ModelForm):
             'date': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
 
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fees = cleaned_data.get('fees')
+
+        if fees < 10000:
+            msg = " Fees should be grater than 10000"
+            self.add_error("fees", msg)
 
 class StudentRegistraionForm(UserCreationForm):
     class Meta:

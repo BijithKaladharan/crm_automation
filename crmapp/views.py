@@ -5,8 +5,8 @@ from .forms import *
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from datetime import date
+from django.core.paginator import Paginator
 from django.db.models import Sum
-
 
 class Course_Registration(TemplateView):
     model = Course
@@ -34,7 +34,6 @@ class Course_Registration(TemplateView):
                 "form":self.form_class
             }
             return render(request, self.template_name, self.context)
-
 
 class Course_edit(TemplateView):
     model = Course
@@ -76,10 +75,13 @@ class Batch_Creation(TemplateView):
     template_name = 'crmapp/ch_batch_creation.html'
 
     def get(self, request, *args, **kwargs):
-        batches = Batch.objects.all()
+        batches = Batch.objects.all()[::-1]
+        paginator = Paginator(batches, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
         self.context = {
             "form": self.form_class,
-            "batches": batches
+            "page_obj": page_obj
         }
         return render(request, self.template_name, self.context)
 
@@ -156,9 +158,7 @@ class CounsellorLogin(TemplateView):
     # form_class = LoginForm
     template_name = 'crmapp/cs_login.html'
     def get(self, request, *args, **kwargs):
-        # self.context = {
-        #     "form":self.form_class
-        # }
+
         return render(request, self.template_name)
     def post(self, request, *args, **kwargs):
 
@@ -172,6 +172,8 @@ class CounsellorLogin(TemplateView):
             else:
               return render(request,'crmapp/login.html',{"message":"invalid password or username"})
         return render(request,'crmapp/login.html')
+
+
 
 class Counsellor_View(TemplateView):
     model = User
@@ -233,10 +235,13 @@ class Enquiry_Creation(TemplateView):
         else:
             eid = 'EID-1000'
         form = self.form_class(initial={'enquiry_id': eid})
-        students = Enquiry.objects.all()
+        students = Enquiry.objects.all()[::-1]
+        paginator = Paginator(students, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
         self.context = {
-           "students":students,
-            "form":form,
+            "form": self.form_class,
+            "page_obj": page_obj
         }
         return render(request, self.template_name, self.context)
 
@@ -256,6 +261,12 @@ class Enquiry_Creation(TemplateView):
             }
             return render(request, self.template_name, self.context)
 
+def load_course(request):
+    course_id = request.GET.get('course_id')
+    batches = Batch.objects.filter(course_name=course_id).all()
+    return render(request, 'crmapp/course_dropdown.html', {'batches': batches})
+    # return JsonResponse(list(cities.values('id', 'name')), safe=False)
+
 class Enquiry_Edit(TemplateView):
     model = Enquiry
     form_class = EnquiryCreateForm
@@ -274,6 +285,9 @@ class Enquiry_Edit(TemplateView):
         id = kwargs.get("id")
         students = self.get_object(id)
         form = self.form_class(request.POST, instance=students)
+        self.context = {
+            "form": form
+        }
         if form.is_valid():
             #eid = form.cleaned_data.get("enquiry_id")
 
@@ -334,10 +348,14 @@ class Admission_Creation(TemplateView):
 
         #form = self.form_class(initial={'admission_number': adm,'eid':eid, 'batch_code':code})
 
+        paginator = Paginator(admissions, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
         self.context = {
-            "admissions": admissions,
             "form": form,
+            "page_obj": page_obj
         }
+
         return render(request, self.template_name, self.context)
 
     def post(self, request, *args, **kwargs):
@@ -502,6 +520,7 @@ class Student_Payments(TemplateView):
                 "form": self.form_class
             }
             return render(request, self.template_name, self.context)
+
 
 class DashBoard(TemplateView):
     template_name = 'crmapp/admin.html'

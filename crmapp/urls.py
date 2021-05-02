@@ -42,6 +42,7 @@ urlpatterns = [
     path('st_login', Student_login.as_view(), name='st_login'),
     path('pay', Student_Payments.as_view(), name='pay'),
     path('home', DashBoard.as_view(), name='home'),
+    path('ajax/load-course/',load_course, name='ajax_load_course'),
 
 
 ]
