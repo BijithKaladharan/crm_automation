@@ -123,6 +123,10 @@ class Batch_edit(TemplateView):
         if form.is_valid():
             form.save()
             return redirect('batch')
+        # self.context = {
+        #     "form": self.form_class
+        # }
+
         return render(request, self.template_name, self.context)
 
 class Batch_delete(TemplateView):
@@ -240,7 +244,7 @@ class Enquiry_Creation(TemplateView):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         self.context = {
-            "form": self.form_class,
+            "form":form,
             "page_obj": page_obj
         }
         return render(request, self.template_name, self.context)
@@ -251,13 +255,13 @@ class Enquiry_Creation(TemplateView):
             form.save()
             students = Enquiry.objects.all()
             self.context = {
-                "form": self.form_class,
+
                 "students": students
             }
             return redirect('enquiry')
         else:
             self.context = {
-                "form": self.form_class
+                "form": form
             }
             return render(request, self.template_name, self.context)
 
@@ -358,22 +362,39 @@ class Admission_Creation(TemplateView):
 
         return render(request, self.template_name, self.context)
 
+    # def post(self, request, *args, **kwargs):
+    #     form = self.form_class(request.POST)
+    #
+    #     if form.is_valid():
+    #         form.save()
+    #         admissions = Admissions.objects.all()
+    #         self.context = {
+    #             "form":form,
+    #             "admissions": admissions
+    #         }
+    #         return render(request, self.template_name, self.context)
+    #     else:
+    #         return HttpResponse("error")
+            # self.context = {
+            #     "form": self.form_class
+            # }
+            # return render(request, self.template_name, self.context)
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
-
         if form.is_valid():
             form.save()
             admissions = Admissions.objects.all()
             self.context = {
-                "form": self.form_class,
+
                 "admissions": admissions
             }
             return render(request, self.template_name, self.context)
         else:
             self.context = {
-                "form": self.form_class
+                "form": form
             }
             return render(request, self.template_name, self.context)
+
 
 class Admission_Edit(TemplateView):
     model = Admissions

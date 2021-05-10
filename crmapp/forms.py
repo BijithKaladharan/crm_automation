@@ -21,7 +21,7 @@ class BatchCreateForm(ModelForm):
         widgets = {
             'batch_code': forms.TextInput(attrs={'class': 'form-control'}),
             'course_name': forms.Select(attrs={'class': 'form-control'}),
-            'Start_date': forms.TextInput(attrs={'class': 'form-control'}),
+            'Start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'fees': forms.TextInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
 
@@ -32,7 +32,7 @@ class BatchCreateForm(ModelForm):
             fees = cleaned_data.get('fees')
 
             if fees < 10000:
-                msg = " Fees should be grater than 10000"
+                msg = " Fees should be greater than 10000"
                 self.add_error("fees", msg)
 
 

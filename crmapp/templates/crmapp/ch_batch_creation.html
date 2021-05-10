@@ -13,7 +13,7 @@
         <td>Fees</td>
         <td>Status</td>
     </tr>
-    {% for batch in batches %}
+    {% for batch in page_obj %}
     <tr>
         <td>{{ batch.batch_code }}</td>
         <td>{{ batch.course_name }}</td>
