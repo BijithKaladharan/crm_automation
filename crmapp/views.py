@@ -160,7 +160,7 @@ class CounsellorRegistration(TemplateView):
 
 class CounsellorLogin(TemplateView):
     # form_class = LoginForm
-    template_name = 'crmapp/cs_login.html'
+    template_name = 'crmapp/login.html'
     def get(self, request, *args, **kwargs):
 
         return render(request, self.template_name)
@@ -362,23 +362,7 @@ class Admission_Creation(TemplateView):
 
         return render(request, self.template_name, self.context)
 
-    # def post(self, request, *args, **kwargs):
-    #     form = self.form_class(request.POST)
-    #
-    #     if form.is_valid():
-    #         form.save()
-    #         admissions = Admissions.objects.all()
-    #         self.context = {
-    #             "form":form,
-    #             "admissions": admissions
-    #         }
-    #         return render(request, self.template_name, self.context)
-    #     else:
-    #         return HttpResponse("error")
-            # self.context = {
-            #     "form": self.form_class
-            # }
-            # return render(request, self.template_name, self.context)
+
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
@@ -386,14 +370,16 @@ class Admission_Creation(TemplateView):
             admissions = Admissions.objects.all()
             self.context = {
 
+
                 "admissions": admissions
             }
-            return render(request, self.template_name, self.context)
+            return render(request,self.template_name,self.context)
         else:
             self.context = {
-                "form": form
+                "form":form
             }
             return render(request, self.template_name, self.context)
+
 
 
 class Admission_Edit(TemplateView):
